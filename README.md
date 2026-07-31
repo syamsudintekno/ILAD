@@ -15,7 +15,12 @@ Unlike conventional dashboards that rely solely on raw average scores, ILAD inte
 The project follows a modular software architecture and Design Science Research Methodology (DSRM).
 
 ---
+## Related Publications
 
+- Syamsudin, et al. (2026). *Restoring Distributional Properties of Ceiling-Compressed Student Evaluation of Teaching Data via Relative Performance Indexing.* (Submitted)
+
+- Development of an Institutional Learning Analytics Dashboard Prototype for Lecturer Performance Evaluation. (In Progress)
+---
 ## Research Objectives
 
 - Analyze institutional EDOM data
