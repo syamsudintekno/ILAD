@@ -22,6 +22,9 @@ def test_validate_dataset_returns_valid_typed_result() -> None:
 
     assert isinstance(result, ValidationResult)
     assert result.is_valid
+    assert result.errors == {}
+    assert result.warnings == ()
+    assert result.summary["missing_value_count"] == 0
 
 
 def test_validate_dataset_reports_issues_without_mutating_data() -> None:
@@ -38,6 +41,8 @@ def test_validate_dataset_reports_issues_without_mutating_data() -> None:
     assert result.duplicate_row_count == 0
     assert result.missing_values == {"P2": 1}
     assert result.invalid_score_counts == {"P1": 1}
+    assert result.errors["missing_values"] == {"P2": 1}
+    assert result.summary["invalid_score_count"] == 1
     pd.testing.assert_frame_equal(dataset, original)
 
 

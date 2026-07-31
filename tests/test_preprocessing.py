@@ -3,7 +3,12 @@
 import pandas as pd
 import pytest
 
-from config.schema import COMPETENCY_MAPPING, INDICATOR_COLUMNS, REQUIRED_COLUMNS
+from config.schema import (
+    COMPETENCY_MAPPING,
+    INDICATOR_COLUMNS,
+    PREPARED_COLUMNS,
+    REQUIRED_COLUMNS,
+)
 from core.preprocessing import (
     aggregate_by_lecturer,
     map_competency_dimensions,
@@ -59,6 +64,7 @@ def test_preprocess_dataset_returns_lecturer_level_means() -> None:
     result = preprocess_dataset(make_raw_dataset())
 
     assert len(result) == 1
+    assert tuple(result.columns) == PREPARED_COLUMNS
     assert result.loc[0, "lecturer_name"] == "Dr. Ani"
     assert result.loc[0, "P1"] == 3
     assert result.loc[0, "pedagogic"] == 3

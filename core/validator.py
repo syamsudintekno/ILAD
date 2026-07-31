@@ -20,12 +20,14 @@ class ValidationResult:
         duplicate_row_count: Number of rows that duplicate an earlier row.
         missing_values: Count of missing values by present column.
         invalid_score_counts: Invalid P1--P20 values by present indicator.
+        warnings: Non-fatal validation messages.
     """
 
     missing_columns: tuple[str, ...] = ()
     duplicate_row_count: int = 0
     missing_values: Mapping[str, int] = field(default_factory=dict)
     invalid_score_counts: Mapping[str, int] = field(default_factory=dict)
+    warnings: tuple[str, ...] = ()
 
     @property
     def is_valid(self) -> bool:
@@ -36,6 +38,31 @@ class ValidationResult:
             or self.missing_values
             or self.invalid_score_counts
         )
+
+    @property
+    def errors(self) -> Mapping[str, object]:
+        """Return structured errors detected in the dataset."""
+        errors: dict[str, object] = {}
+        if self.missing_columns:
+            errors["missing_columns"] = self.missing_columns
+        if self.duplicate_row_count:
+            errors["duplicate_row_count"] = self.duplicate_row_count
+        if self.missing_values:
+            errors["missing_values"] = self.missing_values
+        if self.invalid_score_counts:
+            errors["invalid_score_counts"] = self.invalid_score_counts
+        return errors
+
+    @property
+    def summary(self) -> Mapping[str, int]:
+        """Return aggregate counts of validation findings."""
+        return {
+            "missing_column_count": len(self.missing_columns),
+            "duplicate_row_count": self.duplicate_row_count,
+            "missing_value_count": sum(self.missing_values.values()),
+            "invalid_score_count": sum(self.invalid_score_counts.values()),
+            "warning_count": len(self.warnings),
+        }
 
 
 def validate_dataset(
