@@ -8,6 +8,10 @@ PROFESSIONAL_COLUMN = "professional"
 PERSONALITY_COLUMN = "personality"
 SOCIAL_COLUMN = "social"
 OVERALL_SCORE_COLUMN = "overall_score"
+RPI_COLUMN = "rpi"
+RANK_COLUMN = "rank"
+QUARTILE_COLUMN = "quartile"
+QUARTILE_LABELS: tuple[str, ...] = ("Q1", "Q2", "Q3", "Q4")
 
 IDENTITY_COLUMNS: tuple[str, ...] = (
     LECTURER_NAME_COLUMN,
@@ -22,6 +26,13 @@ COMPETENCY_MAPPING: dict[str, tuple[str, ...]] = {
     SOCIAL_COLUMN: tuple(f"P{number}" for number in range(17, 21)),
 }
 COMPETENCY_COLUMNS: tuple[str, ...] = tuple(COMPETENCY_MAPPING)
+DIMENSION_COLUMNS: tuple[str, ...] = COMPETENCY_COLUMNS
+DEFAULT_RPI_WEIGHTS: dict[str, float] = {
+    column: 1 / len(DIMENSION_COLUMNS) for column in DIMENSION_COLUMNS
+}
+ANALYTIC_SCORE_COLUMNS: tuple[str, ...] = COMPETENCY_COLUMNS + (
+    OVERALL_SCORE_COLUMN,
+)
 REQUIRED_COLUMNS: tuple[str, ...] = IDENTITY_COLUMNS + INDICATOR_COLUMNS
 PREPARED_COLUMNS: tuple[str, ...] = (
     LECTURER_NAME_COLUMN,

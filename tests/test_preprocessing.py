@@ -64,10 +64,15 @@ def test_preprocess_dataset_returns_lecturer_level_means() -> None:
     result = preprocess_dataset(make_raw_dataset())
 
     assert len(result) == 1
+    assert result["lecturer_name"].is_unique
     assert tuple(result.columns) == PREPARED_COLUMNS
+    assert "P1" not in result.columns
+    assert "P20" not in result.columns
     assert result.loc[0, "lecturer_name"] == "Dr. Ani"
-    assert result.loc[0, "P1"] == 3
     assert result.loc[0, "pedagogic"] == 3
+    assert result.loc[0, "professional"] == 3
+    assert result.loc[0, "personality"] == 3
+    assert result.loc[0, "social"] == 3
     assert result.loc[0, "overall_score"] == 3
 
 
