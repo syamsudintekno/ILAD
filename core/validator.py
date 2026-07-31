@@ -5,14 +5,7 @@ from typing import Mapping, Sequence
 
 import pandas as pd
 
-
-IDENTITY_COLUMNS: tuple[str, ...] = (
-    "lecturer_name",
-    "study_program",
-    "faculty",
-)
-INDICATOR_COLUMNS: tuple[str, ...] = tuple(f"P{number}" for number in range(1, 21))
-REQUIRED_COLUMNS: tuple[str, ...] = IDENTITY_COLUMNS + INDICATOR_COLUMNS
+from config.schema import INDICATOR_COLUMNS, REQUIRED_COLUMNS
 
 
 @dataclass(frozen=True)
