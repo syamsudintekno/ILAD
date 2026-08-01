@@ -6,7 +6,11 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from application.controller import AnalyticsController, DatasetValidationError
+from application.controller import (
+    ANALYTICS_RESULT_SESSION_KEY,
+    AnalyticsController,
+    DatasetValidationError,
+)
 from config.schema import (
     LECTURER_NAME_COLUMN,
     QUARTILE_COLUMN,
@@ -37,6 +41,7 @@ def render_overview() -> None:
         st.error("The uploaded dataset could not be processed.")
         return
 
+    st.session_state[ANALYTICS_RESULT_SESSION_KEY] = result
     st.success("Dashboard generated successfully.")
     _render_kpis(result.kpis)
     _render_quartile_distribution(result.kpis["quartile_distribution"])

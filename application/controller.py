@@ -15,10 +15,13 @@ from core.preprocessing import preprocess_dataset
 from core.validator import ValidationResult, validate_dataset
 
 __all__ = [
+    "ANALYTICS_RESULT_SESSION_KEY",
     "AnalyticsController",
     "AnalyticsRunResult",
     "DatasetValidationError",
 ]
+
+ANALYTICS_RESULT_SESSION_KEY = "analytics_run_result"
 
 
 @dataclass(frozen=True)
