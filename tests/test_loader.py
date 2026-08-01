@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+from io import BytesIO
 
 from core.loader import CsvFileNotFoundError, EmptyCsvFileError, load_csv
 
@@ -30,3 +31,12 @@ def test_load_csv_raises_for_empty_file(tmp_path) -> None:
 
     with pytest.raises(EmptyCsvFileError):
         load_csv(csv_file)
+
+
+def test_load_csv_reads_binary_file_like_object() -> None:
+    """Load uploaded CSV content without requiring a local path."""
+    uploaded_content = BytesIO(b"lecturer_name,P1\nDr. Ani,5\n")
+
+    result = load_csv(uploaded_content)
+
+    assert result.to_dict("records") == [{"lecturer_name": "Dr. Ani", "P1": 5}]
