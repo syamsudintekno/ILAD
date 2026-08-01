@@ -161,3 +161,7 @@ def _prepare_top_lecturer_table(analytics_data: pd.DataFrame) -> pd.DataFrame:
         .head(10)
         .rename(columns=labels)
     )
+
+
+if __name__ == "__main__":
+    render_overview()
