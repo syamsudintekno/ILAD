@@ -1,10 +1,11 @@
 """Descriptive statistics for prepared EDOM datasets."""
 
-from dataclasses import dataclass
-from typing import Mapping, Sequence
+from dataclasses import dataclass, field
+from typing import Callable, Mapping, Sequence
 
 import pandas as pd
 
+from analytics.distribution import calculate_kurtosis, calculate_skewness
 from config.schema import ANALYTIC_SCORE_COLUMNS
 
 
@@ -19,6 +20,8 @@ class StatisticsResult:
         maximum: Largest value for each score column.
         variance: Population variance for each score column.
         standard_deviation: Population standard deviation for each score column.
+        skewness: Distribution skewness for each score column.
+        kurtosis: Distribution excess kurtosis for each score column.
     """
 
     mean: Mapping[str, float]
@@ -27,6 +30,8 @@ class StatisticsResult:
     maximum: Mapping[str, float]
     variance: Mapping[str, float]
     standard_deviation: Mapping[str, float]
+    skewness: Mapping[str, float] = field(default_factory=dict)
+    kurtosis: Mapping[str, float] = field(default_factory=dict)
 
 
 def calculate_descriptive_statistics(
@@ -56,9 +61,19 @@ def calculate_descriptive_statistics(
         maximum=_to_float_mapping(selected_scores.max()),
         variance=_to_float_mapping(selected_scores.var(ddof=0)),
         standard_deviation=_to_float_mapping(selected_scores.std(ddof=0)),
+        skewness=_calculate_shape_metrics(selected_scores, calculate_skewness),
+        kurtosis=_calculate_shape_metrics(selected_scores, calculate_kurtosis),
     )
 
 
 def _to_float_mapping(values: pd.Series) -> dict[str, float]:
     """Convert a statistics Series into a plain typed mapping."""
     return {str(column): float(value) for column, value in values.items()}
+
+
+def _calculate_shape_metrics(
+    scores: pd.DataFrame,
+    calculator: Callable[[Sequence[float]], float],
+) -> dict[str, float]:
+    """Calculate a distribution shape metric for each score column."""
+    return {column: calculator(scores[column]) for column in scores.columns}

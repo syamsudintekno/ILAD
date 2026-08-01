@@ -6,10 +6,12 @@ from typing import BinaryIO
 import pandas as pd
 
 from analytics.kpi import calculate_institutional_kpis
+from analytics.distribution import DistributionComparison, compare_distributions
 from analytics.quartile import calculate_quartiles
 from analytics.ranking import calculate_ranking
 from analytics.rpi import calculate_rpi
 from analytics.statistics import StatisticsResult, calculate_descriptive_statistics
+from config.schema import OVERALL_SCORE_COLUMN, RPI_COLUMN
 from core.loader import load_csv
 from core.preprocessing import preprocess_dataset
 from core.validator import ValidationResult, validate_dataset
@@ -32,11 +34,13 @@ class AnalyticsRunResult:
         analytics_data: Lecturer-level data after RPI, ranking, and quartiles.
         statistics: Descriptive statistics for the prepared input dataset.
         kpis: Institution-wide performance indicators.
+        distribution_comparison: Raw overall-score and RPI distribution metrics.
     """
 
     analytics_data: pd.DataFrame
     statistics: StatisticsResult
     kpis: dict[str, float | int | dict[str, int]]
+    distribution_comparison: DistributionComparison | None = None
 
 
 class DatasetValidationError(ValueError):
@@ -70,10 +74,21 @@ class AnalyticsController:
         ranked_data = calculate_ranking(scored_data)
         classified_data = calculate_quartiles(ranked_data)
         kpis = calculate_institutional_kpis(classified_data)
+        rpi_statistics = calculate_descriptive_statistics(
+            classified_data,
+            score_columns=(RPI_COLUMN,),
+        )
+        distribution_comparison = compare_distributions(
+            statistics,
+            rpi_statistics,
+            OVERALL_SCORE_COLUMN,
+            RPI_COLUMN,
+        )
         return AnalyticsRunResult(
             analytics_data=classified_data,
             statistics=statistics,
             kpis=kpis,
+            distribution_comparison=distribution_comparison,
         )
 
     def run_uploaded_csv(self, uploaded_file: BinaryIO) -> AnalyticsRunResult:
