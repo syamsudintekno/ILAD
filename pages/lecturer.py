@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from application.controller import ANALYTICS_RESULT_SESSION_KEY, AnalyticsRunResult
+from components.footer import render_footer
 from config.schema import (
     DIMENSION_COLUMNS,
     LECTURER_NAME_COLUMN,
@@ -13,14 +14,16 @@ from config.schema import (
     RPI_COLUMN,
     STUDY_PROGRAM_COLUMN,
 )
-
+from ui.theme import PRIMARY_TURQUOISE, apply_theme, render_brand_header, render_section_header
 
 def render_lecturer_profile() -> None:
     """Render the selected lecturer profile from completed analytics data."""
-    st.title("Lecturer Profile")
+    apply_theme()
+    render_brand_header("Lecturer Profile")
     analytics_data = _get_analytics_data()
     if analytics_data is None:
         st.info("Upload a valid synthetic EDOM CSV on the Dashboard Overview page first.")
+        render_footer()
         return
 
     lecturer_name = st.selectbox(
@@ -34,6 +37,7 @@ def render_lecturer_profile() -> None:
     _render_metrics(lecturer)
     _render_dimension_radar(lecturer)
     _render_dimension_summary(lecturer)
+    render_footer()
 
 
 def _get_analytics_data() -> pd.DataFrame | None:
@@ -46,7 +50,7 @@ def _get_analytics_data() -> pd.DataFrame | None:
 
 def _render_identity(lecturer: pd.Series) -> None:
     """Display the selected lecturer's identity details."""
-    st.subheader(str(lecturer[LECTURER_NAME_COLUMN]))
+    render_section_header(str(lecturer[LECTURER_NAME_COLUMN]))
     st.write(f"Study Program: {lecturer[STUDY_PROGRAM_COLUMN]}")
 
 
@@ -63,19 +67,24 @@ def _render_dimension_radar(lecturer: pd.Series) -> None:
     dimensions = [column.title() for column in DIMENSION_COLUMNS]
     scores = [float(lecturer[column]) for column in DIMENSION_COLUMNS]
     figure = go.Figure(
-        go.Scatterpolar(r=scores, theta=dimensions, fill="toself")
+        go.Scatterpolar(
+            r=scores,
+            theta=dimensions,
+            fill="toself",
+            line={"color": PRIMARY_TURQUOISE},
+        )
     )
     figure.update_layout(
         polar={"radialaxis": {"range": [1, 5]}},
         showlegend=False,
     )
-    st.subheader("Competency Profile")
+    render_section_header("Competency Profile")
     st.plotly_chart(figure, use_container_width=True)
 
 
 def _render_dimension_summary(lecturer: pd.Series) -> None:
     """Display the selected lecturer's competency scores as a table."""
-    st.subheader("Dimension Summary")
+    render_section_header("Dimension Summary")
     st.dataframe(_prepare_dimension_summary(lecturer), hide_index=True)
 
 

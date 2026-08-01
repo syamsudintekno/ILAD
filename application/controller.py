@@ -21,7 +21,7 @@ __all__ = [
     "DatasetValidationError",
 ]
 
-ANALYTICS_RESULT_SESSION_KEY = "analytics_run_result"
+ANALYTICS_RESULT_SESSION_KEY = "analytics_result"
 
 
 @dataclass(frozen=True)
