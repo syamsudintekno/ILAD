@@ -47,6 +47,14 @@ button.secondary { color: #16464c; background: white; border-color: #a6bab8; }
 .page-switch { display: flex; gap: .5rem; flex-wrap: wrap; }
 .page-switch button[aria-pressed="true"] { background: #176657; color: white; border-color: #176657; }
 .chart.distribution li { grid-template-columns: minmax(6rem, auto) 1fr 2.5rem; }
+.comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1rem; }
+.boxplot { margin: 1rem .4rem; position: relative; height: 2rem; background: #eef4f3; }
+.boxplot span { position: absolute; }
+.boxplot .whisker { top: 50%; border-top: 2px solid #217761; }
+.boxplot .box { top: 20%; height: 60%; border: 2px solid #217761; background: #cce9e0; }
+.boxplot .median { top: 20%; height: 60%; border-left: 2px solid #10353b; }
+.boxplot-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 0; }
+.boxplot-values dd { margin: 0; font-weight: 700; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; margin-top: .7rem; white-space: nowrap; }
 th, td { text-align: left; padding: .65rem; border-bottom: 1px solid #dce9e7; }

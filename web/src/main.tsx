@@ -5,6 +5,7 @@ import { ApiError, quartiles, requestRun, type Overview, type Run } from './api'
 import { auth, persistence } from './firebase';
 import './styles.css';
 import { InstitutionalResults } from './InstitutionalAnalytics';
+import { DistributionComparison } from './DistributionComparison';
 
 const rpiFormat = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 const maxFileSize = 2 * 1024 * 1024;
@@ -97,7 +98,8 @@ function Results({ overview }: { overview: Overview }) {
 }
 
 function Dashboard({ user }: { user: User }) {
-  const [page, setPage] = useState<'overview' | 'institutional'>('overview');
+  const [page, setPage] = useState<'overview' | 'institutional' | 'distribution'>('overview');
+  const pages = { overview: 'Overview', institutional: 'Analitik Institusi', distribution: 'Distribusi' } as const;
   const storageKey = `ilad:last-run:${user.uid}`;
   const [runId, setRunId] = useState(() => sessionStorage.getItem(storageKey));
   const [run, setRun] = useState<Run | null>(null);
@@ -151,7 +153,7 @@ function Dashboard({ user }: { user: User }) {
 
   return <div className="dashboard">
     <div className="page-heading">
-      <div><p className="eyebrow">ANALITIK EDOM</p><h1>{page === 'overview' ? 'Overview' : 'Analitik Institusi'}</h1>
+      <div><p className="eyebrow">ANALITIK EDOM</p><h1>{pages[page]}</h1>
         <p>Skor dan peringkat RPI dihitung pada kohor dari satu unggahan.</p></div>
       <button type="button" className="secondary" disabled={busy} onClick={() => {
         if (auth) void signOut(auth).catch(() => setError(new Error('Tidak dapat keluar. Silakan coba lagi.')));
@@ -160,6 +162,7 @@ function Dashboard({ user }: { user: User }) {
     <nav className="page-switch" aria-label="Halaman analitik">
       <button type="button" className="secondary" aria-pressed={page === 'overview'} onClick={() => setPage('overview')}>Overview</button>
       <button type="button" className="secondary" aria-pressed={page === 'institutional'} onClick={() => setPage('institutional')}>Analitik Institusi</button>
+      <button type="button" className="secondary" aria-pressed={page === 'distribution'} onClick={() => setPage('distribution')}>Distribusi</button>
     </nav>
     <section className="card" hidden={page !== 'overview'}>
       <h2>Unggah CSV EDOM</h2>
@@ -182,6 +185,9 @@ function Dashboard({ user }: { user: User }) {
       : <p className="notice">{run?.overview
         ? 'Unggah ulang CSV di Overview untuk membuat statistik bagi run ini.'
         : 'Unggah dan proses CSV di Overview untuk melihat analitik institusi.'}</p>)}
+    {page === 'distribution' && (run?.distribution
+      ? <DistributionComparison {...run.distribution} />
+      : <p className="notice">Unggah dan proses CSV di Overview untuk melihat perbandingan distribusi.</p>)}
   </div>;
 }
 

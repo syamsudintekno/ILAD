@@ -18,6 +18,7 @@ from config.schema import (
 )
 from core.loader import EmptyCsvFileError
 from pages.analytics import _prepare_statistics_table
+from pages.distribution import _prepare_statistics_table as _prepare_distribution_table
 
 
 def make_csv(scores: list[float]) -> bytes:
@@ -70,6 +71,24 @@ def test_institutional_analytics_matches_streamlit_cohort() -> None:
     assert histogram[0]["lower"] == reference.analytics_data["rpi"].min()
     assert histogram[-1]["upper"] == reference.analytics_data["rpi"].max()
     assert payload["overview"]["kpis"]["quartile_distribution"] == {"Q1": 1, "Q2": 2, "Q3": 0, "Q4": 0}
+
+
+def test_distribution_matches_streamlit_statistics_and_score_ranges() -> None:
+    """Check both variables against the same cohort used by Streamlit."""
+    csv = make_csv([5.0, 4.0, 4.0, 3.0, 3.0])
+    payload = build_web_overview(csv)
+    reference = AnalyticsController().run_uploaded_csv(BytesIO(csv))
+    table = _prepare_distribution_table(reference.distribution_comparison)
+    for key, label in (("edom", "Overall Score"), ("rpi", "RPI")):
+        series = payload["distribution"][key]
+        for metric, expected in zip(table["Metric"], table[label], strict=True):
+            assert series["statistics"][metric.lower().replace(" ", "_")] == pytest.approx(expected)
+        assert sum(interval["count"] for interval in series["histogram"]) == 5
+        assert series["histogram"][0]["lower"] == table.loc[4, label]
+        assert series["histogram"][-1]["upper"] == table.loc[5, label]
+        assert series["boxplot"]["median"] == table.loc[1, label]
+    assert payload["distribution"]["edom"]["boxplot"]["q1"] == 3.0
+    assert payload["distribution"]["edom"]["boxplot"]["q3"] == 4.0
 
 
 def test_web_overview_preserves_structured_validation_errors() -> None:

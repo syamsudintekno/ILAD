@@ -28,6 +28,7 @@ export interface Run {
   status: 'processing' | 'succeeded' | 'invalid' | 'failed';
   overview: Overview | null;
   institutional_analytics?: InstitutionalAnalytics;
+  distribution?: Record<'edom' | 'rpi', ScoreDistribution>;
   error?: { message: string };
   validation?: {
     findings: {
@@ -40,6 +41,20 @@ export interface Run {
 }
 
 export const statisticColumns = ['mean', 'median', 'standard_deviation', 'variance', 'minimum', 'maximum'] as const;
+export const distributionMetrics = [...statisticColumns, 'skewness', 'kurtosis'] as const;
+
+export interface ScoreDistribution {
+  histogram: InstitutionalAnalytics['rpi_histogram'];
+  statistics: Record<typeof distributionMetrics[number], number | null>;
+  boxplot: {
+    lower_whisker: number;
+    q1: number;
+    median: number;
+    q3: number;
+    upper_whisker: number;
+    outlier_count: number;
+  };
+}
 
 export interface InstitutionalAnalytics {
   statistics: (Record<typeof statisticColumns[number], number | null> & { score: string })[];

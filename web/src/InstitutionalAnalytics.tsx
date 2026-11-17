@@ -6,7 +6,7 @@ const scoreLabels: Record<string, string> = {
   social: 'Sosial', overall_score: 'Skor EDOM keseluruhan',
 };
 
-function Distribution({ title, rows }: { title: string; rows: [string, number][] }) {
+export function Distribution({ title, rows }: { title: string; rows: [string, number][] }) {
   const largest = Math.max(1, ...rows.map(([, count]) => count));
   return <section className="card">
     <h2>{title}</h2>
