@@ -33,7 +33,7 @@ jobs:
     env:
       ILAD_STORAGE_BUCKET: demo-ilad.appspot.com
       ILAD_ANALYTICS_VERSION: ${{ github.sha }}
-      ILAD_ALLOWED_ORIGINS: http://localhost:5173
+      ILAD_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -41,17 +41,25 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.13"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
       - name: Prepare demo Firebase environment
         run: |
           python firebase/stage_functions.py
           python -m venv .ilad-functions/venv
           .ilad-functions/venv/bin/python -m pip install -r firebase/requirements.txt
           npm install --global firebase-tools@15.36.0
+      - name: Install browser test dependencies
+        working-directory: web
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
       - name: Run Firebase integration checks
         run: |
           export JAVA_HOME="$JAVA_HOME_21_X64"
           export PATH="$JAVA_HOME/bin:$PATH"
-          firebase emulators:exec --project demo-ilad --only auth,firestore,storage,functions '.ilad-functions/venv/bin/python firebase/emulator_smoke.py'
+          firebase emulators:exec --project demo-ilad --only auth,firestore,storage,functions '.ilad-functions/venv/bin/python firebase/emulator_smoke.py && .ilad-functions/venv/bin/python firebase/browser_seed.py && npm --prefix web run test:e2e'
 
   web-build:
     name: ILAD web build

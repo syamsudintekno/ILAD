@@ -17,7 +17,8 @@ Centang tugas setelah kriteria pada butir tersebut terpenuhi. Catat tautan PR, h
 - [x] Tambahkan job Firebase Emulator ke workflow CI. Script lulus secara lokal.
 - [x] Verifikasi job `ILAD Firebase emulator tests` pada [runner GitHub](https://github.com/syamsudintekno/ILAD/actions/runs/44022811679).
 - [x] Tambahkan typecheck dan build frontend ke CI. Build lokal lulus.
-- [ ] Verifikasi job `ILAD web build` pada runner GitHub dan tambahkan E2E browser.
+- [x] Verifikasi job `ILAD web build` pada [runner GitHub](https://github.com/syamsudintekno/ILAD/actions/runs/44023164356).
+- [ ] Tambahkan E2E browser ke CI.
 
 ## 2. Kontrak API dan akses data
 
@@ -49,7 +50,7 @@ Centang tugas setelah kriteria pada butir tersebut terpenuhi. Catat tautan PR, h
 - [x] Jalankan uji HTTP lokal untuk penolakan autentikasi dan peran, penerusan UID pemilik, validasi, ukuran unggahan, serta status retry dan konflik.
 - [x] Verifikasi akses pengguna berwenang, penolakan run lintas akun, serta penolakan pembacaan langsung Firestore dan Storage dengan script smoke di Firebase Emulator.
 - [ ] Uji alur sesi yang kedaluwarsa ketika frontend tersedia. Verifikasi penolakan token kedaluwarsa di staging.
-- [ ] Jalankan E2E dengan CSV sintetis yang valid serta gagal validasi. Pilot diterima setelah pengguna berwenang dapat login, unggah, melihat hasil yang sesuai Streamlit, membukanya kembali setelah refresh, dan keluar dari sesi.
+- [x] Jalankan E2E browser di Firebase Emulator dengan CSV sintetis valid dan invalid. Admin QA berhasil login, mengunggah, melihat hasil yang cocok dengan tabel Overview Streamlit pada fixture yang sama, membuka kembali hasil setelah refresh, dan keluar. Akun tanpa peran Admin QA tidak melihat kontrol unggah. Fixture berisi tiga dosen dengan satu peringkat seri.
 
 ## 4. Migrasi halaman dan kesetaraan hasil
 
