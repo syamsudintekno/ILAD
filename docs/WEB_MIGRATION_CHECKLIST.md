@@ -55,7 +55,7 @@ Centang tugas setelah kriteria pada butir tersebut terpenuhi. Catat tautan PR, h
 ## 4. Migrasi halaman dan kesetaraan hasil
 
 - [x] Migrasikan Analitik Institusi. Statistik deskriptif dan jumlah per kuartil cocok dengan Streamlit pada kohor sintetis. Histogram web memakai skor RPI yang sama dengan 10 interval berlebar sama. [Uji browser dan CI lulus](https://github.com/syamsudintekno/ILAD/actions/runs/44025725944).
-- [ ] Migrasikan Distribusi. Cocokkan input histogram dan boxplot, tabel statistik, dan skala skor. Jelaskan bahwa perubahan distribusi merupakan hasil deskriptif pada kohor yang dianalisis.
+- [x] Migrasikan Distribusi. Histogram dan boxplot memakai skor EDOM dan RPI pada kohor yang sama. Delapan statistik cocok dengan Streamlit pada kohor sintetis. [Build dan uji Chromium lulus](https://github.com/syamsudintekno/ILAD/actions/runs/44026889118).
 - [ ] Migrasikan Profil Dosen. Cocokkan skor dimensi, RPI, peringkat, dan kuartil. Uji tautan langsung ke profil di luar cakupan pengguna.
 - [ ] Migrasikan Laporan dan ekspor CSV/JSON. Cocokkan kolom dan isi dengan Streamlit untuk cakupan yang sama. Uji bahwa ekspor hanya berisi baris dan kolom yang diizinkan.
 - [ ] Uji filter prodi dan fakultas tanpa menghitung ulang RPI, peringkat, atau kuartil kohor asal. Beri label cakupan KPI atau ringkasan yang memang dihitung untuk subset tampilan.

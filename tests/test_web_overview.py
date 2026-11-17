@@ -19,6 +19,7 @@ from config.schema import (
 from core.loader import EmptyCsvFileError
 from pages.analytics import _prepare_statistics_table
 from pages.distribution import _prepare_statistics_table as _prepare_distribution_table
+from pages.lecturer import _prepare_dimension_summary
 
 
 def make_csv(scores: list[float]) -> bytes:
@@ -89,6 +90,19 @@ def test_distribution_matches_streamlit_statistics_and_score_ranges() -> None:
         assert series["boxplot"]["median"] == table.loc[1, label]
     assert payload["distribution"]["edom"]["boxplot"]["q1"] == 3.0
     assert payload["distribution"]["edom"]["boxplot"]["q3"] == 4.0
+
+
+def test_lecturer_profiles_match_streamlit_beyond_top_ten() -> None:
+    """Preserve the cohort ranking and all four dimensions for each profile."""
+    csv = make_csv([1.0 + index / 4 for index in range(10)] + [5.0, 5.0])
+    profiles = build_web_overview(csv)["lecturer_profiles"]
+    reference = AnalyticsController().run_uploaded_csv(BytesIO(csv)).analytics_data
+    assert len(profiles) == len(reference) == 12
+    for profile, (_, lecturer) in zip(profiles, reference.iterrows(), strict=True):
+        for field in ("lecturer_name", "study_program", "rpi", "rank", "quartile"):
+            assert profile[field] == lecturer[field]
+        dimensions = _prepare_dimension_summary(lecturer)
+        assert [profile[column.lower()] for column in dimensions["Dimension"]] == dimensions["Score"].tolist()
 
 
 def test_web_overview_preserves_structured_validation_errors() -> None:

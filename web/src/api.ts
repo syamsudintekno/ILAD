@@ -29,6 +29,7 @@ export interface Run {
   overview: Overview | null;
   institutional_analytics?: InstitutionalAnalytics;
   distribution?: Record<'edom' | 'rpi', ScoreDistribution>;
+  lecturer_profiles?: LecturerProfile[];
   error?: { message: string };
   validation?: {
     findings: {
@@ -39,6 +40,11 @@ export interface Run {
     };
   };
 }
+
+export const lecturerDimensions = ['pedagogic', 'professional', 'personality', 'social'] as const;
+export type LecturerProfile = Pick<Overview['top_lecturers'][number],
+  'lecturer_name' | 'study_program' | 'rpi' | 'rank' | 'quartile'
+> & Record<typeof lecturerDimensions[number], number>;
 
 export const statisticColumns = ['mean', 'median', 'standard_deviation', 'variance', 'minimum', 'maximum'] as const;
 export const distributionMetrics = [...statisticColumns, 'skewness', 'kurtosis'] as const;

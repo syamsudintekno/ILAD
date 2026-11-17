@@ -82,6 +82,7 @@ def _check() -> None:
     result = next(response.json() for response in responses if response.status_code == 201)
     run_id = result["run_id"]
     assert result["cohort_size"] == 1
+    assert result["lecturer_profiles"][0]["lecturer_name"] == "Dosen Sintetis"
     assert result["overview"]["top_lecturers"][0]["rpi"] == 50.0
     assert upload(key, body).json() == result
     assert upload(key, b"changed").status_code == 409

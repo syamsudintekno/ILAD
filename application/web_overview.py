@@ -12,6 +12,7 @@ from pandas.errors import ParserError
 from application.controller import AnalyticsController
 from config.schema import (
     ANALYTIC_SCORE_COLUMNS,
+    DIMENSION_COLUMNS,
     LECTURER_NAME_COLUMN,
     OVERALL_SCORE_COLUMN,
     QUARTILE_COLUMN,
@@ -38,6 +39,7 @@ class OverviewPayload(TypedDict):
     overview: dict[str, object]
     institutional_analytics: dict[str, object]
     distribution: dict[str, object]
+    lecturer_profiles: list[dict[str, object]]
 
 
 def _histogram(scores: Series) -> list[dict[str, float | int]]:
@@ -125,4 +127,8 @@ def build_web_overview(csv_bytes: bytes) -> OverviewPayload:
             "rpi_histogram": rpi_histogram,
         },
         "distribution": distribution,
+        "lecturer_profiles": analytics_data.loc[:, [
+            LECTURER_NAME_COLUMN, STUDY_PROGRAM_COLUMN, RPI_COLUMN,
+            RANK_COLUMN, QUARTILE_COLUMN, *DIMENSION_COLUMNS,
+        ]].to_dict(orient="records"),
     }

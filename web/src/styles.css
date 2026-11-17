@@ -55,6 +55,9 @@ button.secondary { color: #16464c; background: white; border-color: #a6bab8; }
 .boxplot .median { top: 20%; height: 60%; border-left: 2px solid #10353b; }
 .boxplot-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 0; }
 .boxplot-values dd { margin: 0; font-weight: 700; }
+.card select { width: min(100%, 28rem); font: inherit; color: inherit; background: white; border: 1px solid #a6bab8; border-radius: .55rem; padding: .6rem; margin-bottom: 1rem; }
+.competency-table td { width: 70%; }
+.competency-score { display: grid; grid-template-columns: minmax(2rem, 1fr) 3rem; gap: .75rem; align-items: center; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; margin-top: .7rem; white-space: nowrap; }
 th, td { text-align: left; padding: .65rem; border-bottom: 1px solid #dce9e7; }

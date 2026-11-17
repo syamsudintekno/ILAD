@@ -64,6 +64,12 @@ test('Admin QA validates input, reloads the Overview, and signs out', async ({ p
     await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
   }
   await expect(page.getByRole('row', { name: /^Median/ }).locator('td')).toHaveText(['4', '46,043']);
+  await page.getByRole('button', { name: 'Profil Dosen', exact: true }).click();
+  await page.getByLabel('Pilih dosen').selectOption('Dosen Sintetis C');
+  await expect(page.getByRole('heading', { name: 'Dosen Sintetis C' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Ringkasan profil dosen' }).locator('strong'))
+    .toHaveText(['46,04', '2', 'Q2']);
+  await expect(page.getByRole('table').locator('tbody td')).toHaveText(['4', '4', '4', '4']);
   await page.getByRole('button', { name: 'Keluar' }).click();
   await expect(page.getByRole('heading', { name: 'Masuk ke ILAD' })).toBeVisible();
 });
@@ -72,5 +78,6 @@ test('signed-in viewer cannot see the upload or results', async ({ page }) => {
   await login(page, viewer);
   await expect(page.getByRole('heading', { name: 'Akses pilot dibatasi' })).toBeVisible();
   await expect(page.getByLabel('Berkas CSV')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Profil Dosen' })).toHaveCount(0);
   await expect(page.getByRole('table')).toHaveCount(0);
 });
