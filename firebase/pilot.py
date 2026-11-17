@@ -4,7 +4,9 @@ from hashlib import sha256
 import json
 import re
 
+from firebase_admin import auth
 from flask import Flask, Response, g, jsonify, request
+from flask_cors import CORS
 from pandas.errors import ParserError
 
 from application.controller import DatasetValidationError
@@ -16,6 +18,27 @@ MAX_UPLOAD_BYTES = 2 * 1024 * 1024
 KEY_PATTERN = re.compile(r"[a-zA-Z0-9_-]{1,128}")
 RUN_PATTERN = re.compile(r"[a-f0-9]{64}")
 RESULT_STATUS = {"succeeded": 200, "processing": 202, "invalid": 422, "failed": 500}
+
+
+def create_firebase_app(store, allowed_origins: str):
+    """Use Firebase ID tokens and configured frontend origins."""
+    def verify_token(token: str) -> dict | None:
+        try:
+            return auth.verify_id_token(token, check_revoked=True)
+        except (auth.InvalidIdTokenError, auth.ExpiredIdTokenError, auth.RevokedIdTokenError,
+                auth.UserDisabledError, auth.UserNotFoundError, ValueError):
+            return None
+
+    app = create_app(store, verify_token)
+    CORS(
+        app,
+        resources={r"/v1/runs.*": {"origins": [
+            origin.strip() for origin in allowed_origins.split(",") if origin.strip()
+        ]}},
+        methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key"],
+    )
+    return app
 
 
 def _reply(body, status):
@@ -59,7 +82,7 @@ def create_app(store, verify_token):
 
     @app.before_request
     def authorize():
-        if request.method == "OPTIONS":
+        if request.method == "OPTIONS" or request.endpoint == "health":
             return None
         scheme, _, token = request.headers.get("Authorization", "").partition(" ")
         try:
@@ -71,6 +94,10 @@ def create_app(store, verify_token):
         if claims.get("ilad_role") != "admin_qa":
             return _error("forbidden", "Akun tidak memiliki akses pilot.", 403)
         g.owner = claims["uid"]
+
+    @app.get("/health")
+    def health():
+        return _reply({"status": "ok"}, 200)
 
     @app.get("/v1/runs/<run_id>")
     def get_run(run_id):
