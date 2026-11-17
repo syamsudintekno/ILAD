@@ -2,7 +2,7 @@ import { onIdTokenChanged, signInWithEmailAndPassword, signOut, type User } from
 import { useEffect, useState, type FormEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ApiError, quartiles, requestRun, type Overview, type Run } from './api';
-import { auth, persistence } from './firebase';
+import { auth, missingConfig, persistence } from './firebase';
 import './styles.css';
 import { InstitutionalResults } from './InstitutionalAnalytics';
 import { DistributionComparison } from './DistributionComparison';
@@ -236,7 +236,11 @@ function App() {
   return <>
     <header className="site-header"><div><strong>ILAD</strong><span>Institutional Learning Analytics Dashboard</span></div></header>
     <main>
-      {!auth ? <p className="notice" role="status">Konfigurasi Firebase dan URL API belum tersedia.</p>
+      {!auth ? <section className="notice" role="status">
+        <p>Build ini belum membaca konfigurasi berikut:</p>
+        <ul>{missingConfig.map((name) => <li key={name}><code>{name}</code></li>)}</ul>
+        <p>Periksa variabel di Netlify, lalu buat deploy baru.</p>
+      </section>
         : authError ? <section className="card login">
           <p className="notice error" role="alert">Sesi tidak dapat dimuat. Masuk kembali untuk melanjutkan.</p>
           <button type="button" onClick={endSession}>Keluar</button>
