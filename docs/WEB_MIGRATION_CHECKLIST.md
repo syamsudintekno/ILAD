@@ -15,7 +15,7 @@ Centang tugas setelah kriteria pada butir tersebut terpenuhi. Catat tautan PR, h
 - [ ] Aktifkan job `ILAD Python tests` sebagai *required status check* pada `main`, lalu verifikasi statusnya di PR.
 - [ ] Rekam versi Python serta dependensi analitik yang dipakai untuk perbandingan pilot. Pakai sumber paket dan versi yang sama untuk pengujian dan deployment pilot.
 - [x] Tambahkan job Firebase Emulator ke workflow CI. Script lulus secara lokal.
-- [ ] Verifikasi job `ILAD Firebase emulator tests` pada runner GitHub.
+- [x] Verifikasi job `ILAD Firebase emulator tests` pada [runner GitHub](https://github.com/syamsudintekno/ILAD/actions/runs/44022811679).
 - [x] Tambahkan typecheck dan build frontend ke CI. Build lokal lulus.
 - [ ] Verifikasi job `ILAD web build` pada runner GitHub dan tambahkan E2E browser.
 
@@ -65,6 +65,7 @@ Centang tugas setelah kriteria pada butir tersebut terpenuhi. Catat tautan PR, h
 ## 5. Staging, rilis, dan pemeliharaan
 
 - [x] Tambahkan konfigurasi build Netlify dan fallback rute SPA.
+- [x] Publikasikan frontend di [Netlify staging](https://ilad-rpi-dashboard.netlify.app) dan konfirmasi tampilannya dari akun pengelola.
 - [ ] Verifikasi login, refresh, serta endpoint Firebase pada URL Netlify staging.
 - [ ] Uji konfigurasi Firebase staging, termasuk rules yang terpasang, domain autentikasi, serta pemisahan akun dan data dari lingkungan lain.
 - [ ] Pastikan build publik, log, artefak CI, dan demo hanya menggunakan data sintetis serta bebas dari kredensial server.
