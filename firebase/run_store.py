@@ -19,12 +19,12 @@ class FirestoreRunStore:
         self._bucket = bucket
         self._analytics_version = analytics_version
 
-    def get(self, run_id: str, owner: str) -> dict | None:
+    def get(self, run_id: str, owner: str, *, include_csv: bool = False) -> dict | None:
         """Return the run payload for its owner."""
         run = self._runs.document(run_id).get(timeout=RPC_TIMEOUT).to_dict()
         if run is None or run["owner"] != owner:
             return None
-        return self._response(run)
+        return self._response(run, include_csv=include_csv)
 
     def claim(self, run_id: str, owner: str, digest: str) -> tuple[dict | None, str | None]:
         """Claim a new or retryable run atomically, scoped to the same owner and CSV."""
@@ -92,14 +92,14 @@ class FirestoreRunStore:
         document.update(update, option=option, timeout=RPC_TIMEOUT)
         return self._response(run | update, payload)
 
-    def _response(self, run: dict, payload: dict | None = None) -> dict:
+    def _response(self, run: dict, payload: dict | None = None, *, include_csv: bool = False) -> dict:
         if payload is None:
             if run["status"] == "succeeded":
                 blob = self._bucket.blob(run["result_object"])
                 payload = json.loads(blob.download_as_bytes(timeout=RPC_TIMEOUT))
             else:
                 payload = run.get("details", {})
-        return {
+        response = {
             "schema_version": 1,
             "run_id": run["run_id"],
             "created_at": run["created_at"].isoformat(),
@@ -109,3 +109,7 @@ class FirestoreRunStore:
             "overview": None,
             **payload,
         }
+        response["csv_export_available"] = "analytics_csv" in payload
+        if not include_csv:
+            response.pop("analytics_csv", None)
+        return response

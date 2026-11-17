@@ -98,11 +98,21 @@ def test_lecturer_profiles_match_streamlit_beyond_top_ten() -> None:
     profiles = build_web_overview(csv)["lecturer_profiles"]
     reference = AnalyticsController().run_uploaded_csv(BytesIO(csv)).analytics_data
     assert len(profiles) == len(reference) == 12
+    assert build_web_overview(csv)["analytics_csv"] == reference.to_csv(index=False)
     for profile, (_, lecturer) in zip(profiles, reference.iterrows(), strict=True):
         for field in ("lecturer_name", "study_program", "rpi", "rank", "quartile"):
             assert profile[field] == lecturer[field]
         dimensions = _prepare_dimension_summary(lecturer)
         assert [profile[column.lower()] for column in dimensions["Dimension"]] == dimensions["Score"].tolist()
+
+
+def test_analytics_csv_escapes_spreadsheet_formulas_in_text_fields() -> None:
+    """Protect spreadsheet users while preserving labels in the application."""
+    csv = make_csv([4.0]).replace(b"Dosen sintetis 00", b" =1+1")
+    payload = build_web_overview(csv)
+    assert payload["lecturer_profiles"][0]["lecturer_name"] == " =1+1"
+    exported = pd.read_csv(StringIO(payload["analytics_csv"]))
+    assert exported.loc[0, "lecturer_name"] == "' =1+1"
 
 
 def test_web_overview_preserves_structured_validation_errors() -> None:

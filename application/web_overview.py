@@ -40,6 +40,7 @@ class OverviewPayload(TypedDict):
     institutional_analytics: dict[str, object]
     distribution: dict[str, object]
     lecturer_profiles: list[dict[str, object]]
+    analytics_csv: str
 
 
 def _histogram(scores: Series) -> list[dict[str, float | int]]:
@@ -66,6 +67,16 @@ def _boxplot(scores: Series) -> dict[str, float | int]:
     }
 
 
+def _safe_spreadsheet_text(value: object) -> object:
+    """Keep exported names and program labels from being parsed as formulas."""
+    if isinstance(value, str) and (
+        value.startswith(("\t", "\r", "\n"))
+        or value.lstrip().startswith(("=", "+", "-", "@"))
+    ):
+        return "'" + value
+    return value
+
+
 def build_web_overview(csv_bytes: bytes) -> OverviewPayload:
     """Calculate the pilot payload using the existing Streamlit controller.
 
@@ -79,6 +90,9 @@ def build_web_overview(csv_bytes: bytes) -> OverviewPayload:
     except UnicodeDecodeError as error:
         raise ParserError("CSV must be encoded in UTF-8") from error
     analytics_data = result.analytics_data
+    export_data = analytics_data.copy()
+    for column in (LECTURER_NAME_COLUMN, STUDY_PROGRAM_COLUMN):
+        export_data[column] = export_data[column].map(_safe_spreadsheet_text)
     statistics = result.statistics
     metrics = {
         "mean": statistics.mean,
@@ -106,6 +120,7 @@ def build_web_overview(csv_bytes: bytes) -> OverviewPayload:
             },
         }
     return {
+        "analytics_csv": export_data.to_csv(index=False),
         "cohort_size": len(analytics_data),
         "overview": {
             "kpis": result.kpis,

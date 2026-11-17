@@ -44,6 +44,8 @@ Run baru memuat `distribution.edom` dan `distribution.rpi` dengan histogram, rin
 
 `lecturer_profiles` memuat identitas, prodi, RPI, peringkat, kuartil, dan empat skor dimensi setiap dosen pada kohor. Data profil mengikuti otorisasi run yang sama dengan Overview. Run sebelum migrasi Profil Dosen perlu diproses ulang untuk menghasilkan data ini.
 
+Admin QA pemilik run yang berhasil dapat mengunduh `GET /v1/runs/{run_id}/exports/csv` untuk tabel analitik lengkap dan `GET /v1/runs/{run_id}/exports/json` untuk ringkasan KPI. CSV mengikuti urutan baris dan kolom Streamlit. Nama dosen atau prodi yang berpotensi dibaca sebagai formula spreadsheet diberi awalan apostrof sebelum ekspor. `csv_export_available` menandai apakah run menyimpan CSV. Run lama tetap mendukung unduhan KPI dan perlu diproses ulang untuk menyiapkan CSV.
+
 Pilot memakai akun Admin QA yang ditetapkan di server. Akun tersebut dapat mengunggah dan membaca run miliknya. Fitur ekspor dan akses Kaprodi, Dekan, LPM, serta Rektor masuk setelah pilot. Sebelum peran berbasis cakupan diaktifkan, gunakan sumber keanggotaan prodi dan fakultas yang diverifikasi institusi. Tetapkan cara menangani dosen lintas prodi tanpa mengubah kohor RPI.
 
 API menjadi jalur akses ke metadata Firestore dan objek hasil Cloud Storage. Akses langsung dari frontend ditutup. Firestore menyimpan pemilik, status, waktu, versi analitik, rujukan hasil, dan informasi minimum untuk mendeteksi unggahan berulang. Storage menyimpan hasil pilot. Baca objek melalui API setelah pemeriksaan izin. Berkas CSV diproses dalam permintaan dan tidak disimpan. Tetapkan retensi dan uji penghapusan metadata serta hasil sebelum staging menerima unggahan pengguna.

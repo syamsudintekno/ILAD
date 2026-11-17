@@ -7,6 +7,7 @@ import './styles.css';
 import { InstitutionalResults } from './InstitutionalAnalytics';
 import { DistributionComparison } from './DistributionComparison';
 import { LecturerProfiles } from './LecturerProfiles';
+import { InstitutionalReport } from './InstitutionalReport';
 
 const rpiFormat = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 const maxFileSize = 2 * 1024 * 1024;
@@ -99,7 +100,7 @@ function Results({ overview }: { overview: Overview }) {
 }
 
 function Dashboard({ user }: { user: User }) {
-  const pages = { overview: 'Overview', institutional: 'Analitik Institusi', distribution: 'Distribusi', lecturer: 'Profil Dosen' } as const;
+  const pages = { overview: 'Overview', institutional: 'Analitik Institusi', distribution: 'Distribusi', lecturer: 'Profil Dosen', report: 'Laporan' } as const;
   const [page, setPage] = useState<keyof typeof pages>('overview');
   const storageKey = `ilad:last-run:${user.uid}`;
   const [runId, setRunId] = useState(() => sessionStorage.getItem(storageKey));
@@ -165,6 +166,7 @@ function Dashboard({ user }: { user: User }) {
       <button type="button" className="secondary" aria-pressed={page === 'institutional'} onClick={() => setPage('institutional')}>Analitik Institusi</button>
       <button type="button" className="secondary" aria-pressed={page === 'distribution'} onClick={() => setPage('distribution')}>Distribusi</button>
       <button type="button" className="secondary" aria-pressed={page === 'lecturer'} onClick={() => setPage('lecturer')}>Profil Dosen</button>
+      <button type="button" className="secondary" aria-pressed={page === 'report'} onClick={() => setPage('report')}>Laporan</button>
     </nav>
     <section className="card" hidden={page !== 'overview'}>
       <h2>Unggah CSV EDOM</h2>
@@ -193,6 +195,9 @@ function Dashboard({ user }: { user: User }) {
     {page === 'lecturer' && (run?.lecturer_profiles
       ? <LecturerProfiles key={run.run_id} profiles={run.lecturer_profiles} />
       : <p className="notice">Unggah dan proses CSV di Overview untuk melihat profil dosen.</p>)}
+    {page === 'report' && (run?.overview
+      ? <InstitutionalReport key={run.run_id} user={user} run={run} overview={run.overview} />
+      : <p className="notice">Unggah dan proses CSV di Overview untuk melihat laporan.</p>)}
   </div>;
 }
 

@@ -30,6 +30,7 @@ export interface Run {
   institutional_analytics?: InstitutionalAnalytics;
   distribution?: Record<'edom' | 'rpi', ScoreDistribution>;
   lecturer_profiles?: LecturerProfile[];
+  csv_export_available?: boolean;
   error?: { message: string };
   validation?: {
     findings: {
@@ -94,4 +95,20 @@ export async function requestRun(
     );
   }
   return data as Run;
+}
+
+export async function downloadRunExport(user: User, runId: string, format: 'csv' | 'json') {
+  const response = await fetch(`${apiUrl}/v1/runs/${runId}/exports/${format}`, {
+    headers: { Authorization: `Bearer ${await user.getIdToken()}` },
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new ApiError(data?.error?.message ?? 'Ekspor belum dapat diunduh.', response.status);
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = format === 'csv' ? 'ilad_analytics.csv' : 'ilad_kpi_summary.json';
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

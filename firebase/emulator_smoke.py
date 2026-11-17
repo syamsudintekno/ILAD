@@ -91,6 +91,24 @@ def _check() -> None:
 
     assert httpx.get(f"{API}/{run_id}", headers=bearer(owner)).json() == result
     assert httpx.get(f"{API}/{run_id}", headers=bearer(other)).status_code == 404
+    assert "analytics_csv" not in result and result["csv_export_available"]
+    for extension in ("csv", "json"):
+        url = f"{API}/{run_id}/exports/{extension}"
+        exported = httpx.get(url, headers=bearer(owner))
+        assert exported.status_code == 200
+        assert exported.headers["Cache-Control"] == "no-store"
+        assert exported.headers["Content-Disposition"].startswith("attachment;")
+        assert httpx.get(url, headers=bearer(other)).status_code == 404
+        assert httpx.get(url, headers=bearer(user)).status_code == 403
+        assert httpx.get(url).status_code == 401
+        if extension == "json":
+            assert exported.json() == result["overview"]["kpis"]
+        else:
+            rows = list(csv.DictReader(StringIO(exported.text)))
+            assert len(rows) == 1
+            assert rows[0]["lecturer_name"] == "Dosen Sintetis"
+            assert rows[0]["rpi"] == "50.0"
+            assert "P1" not in rows[0]
 
     document = f"projects/{PROJECT}/databases/(default)/documents/ilad_runs/{run_id}"
     firestore_url = f"http://127.0.0.1:8080/v1/{document}"

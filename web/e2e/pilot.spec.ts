@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 
 const password = 'EmulatorOnly-ILAD-2026';
 const admin = 'qa-browser@example.test';
@@ -70,6 +71,22 @@ test('Admin QA validates input, reloads the Overview, and signs out', async ({ p
   await expect(page.getByRole('region', { name: 'Ringkasan profil dosen' }).locator('strong'))
     .toHaveText(['46,04', '2', 'Q2']);
   await expect(page.getByRole('table').locator('tbody td')).toHaveText(['4', '4', '4', '4']);
+  await page.getByRole('button', { name: 'Laporan', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '20 dosen teratas' })).toBeVisible();
+  const [csvDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Unduh CSV analitik' }).click(),
+  ]);
+  expect(csvDownload.suggestedFilename()).toBe('ilad_analytics.csv');
+  expect(await readFile(await csvDownload.path(), 'utf8')).toContain('Dosen Sintetis C,Prodi B');
+  const [jsonDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Unduh JSON ringkasan KPI' }).click(),
+  ]);
+  expect(jsonDownload.suggestedFilename()).toBe('ilad_kpi_summary.json');
+  const kpis = JSON.parse(await readFile(await jsonDownload.path(), 'utf8'));
+  expect(kpis.lecturer_count).toBe(3);
+  expect(kpis.quartile_distribution).toEqual({ Q1: 1, Q2: 2, Q3: 0, Q4: 0 });
   await page.getByRole('button', { name: 'Keluar' }).click();
   await expect(page.getByRole('heading', { name: 'Masuk ke ILAD' })).toBeVisible();
 });

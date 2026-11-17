@@ -1,9 +1,10 @@
 """HTTP routes for authenticated ILAD pilot runs."""
 
 from hashlib import sha256
+import json
 import re
 
-from flask import Flask, g, jsonify, request
+from flask import Flask, Response, g, jsonify, request
 from pandas.errors import ParserError
 
 from application.controller import DatasetValidationError
@@ -82,6 +83,31 @@ def create_app(store, verify_token):
         if run is None:
             return _error("not_found", "Run tidak tersedia.", 404)
         return _reply(run, 200)
+
+    @app.get("/v1/runs/<run_id>/exports/<file_format>")
+    def export_run(run_id, file_format):
+        if not RUN_PATTERN.fullmatch(run_id) or file_format not in {"csv", "json"}:
+            return _error("not_found", "Ekspor tidak tersedia.", 404)
+        try:
+            run = store.get(run_id, g.owner, include_csv=file_format == "csv")
+        except Exception:
+            return _error("processing_failed", "Ekspor belum dapat dibaca.", 500)
+        if run is None or run["status"] != "succeeded":
+            return _error("not_found", "Ekspor tidak tersedia.", 404)
+        if file_format == "csv":
+            csv = run.get("analytics_csv")
+            if csv is None:
+                return _error("not_found", "Proses ulang CSV untuk menyiapkan ekspor run ini.", 404)
+            filename, content_type, content = "ilad_analytics.csv", "text/csv; charset=utf-8", csv
+        else:
+            filename = "ilad_kpi_summary.json"
+            content_type = "application/json"
+            content = json.dumps(run["overview"]["kpis"], indent=2)
+        return Response(content, content_type=content_type, headers={
+            "Cache-Control": "no-store",
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Content-Type-Options": "nosniff",
+        })
 
     @app.post("/v1/runs")
     def create_run():
