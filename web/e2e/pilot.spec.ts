@@ -38,11 +38,6 @@ test('Admin QA validates input, reloads the Overview, and signs out', async ({ p
   await upload(page, 'valid.csv', validCsv);
   await expect(page.getByRole('status')).toHaveText('Hasil analitik tersedia.');
   await expect(page.getByRole('heading', { name: 'Distribusi kuartil' })).toBeVisible();
-  await page.getByRole('button', { name: 'Distribusi', exact: true }).click();
-  for (const heading of ['Histogram Skor EDOM', 'Histogram RPI', 'Boxplot Skor EDOM', 'Boxplot RPI']) {
-    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
-  }
-  await expect(page.getByRole('row', { name: /^Median/ }).locator('td')).toHaveText(['4', '46,043']);
   const rows = page.getByRole('table').locator('tbody tr');
   const expected = [
     ['1', 'Dosen Sintetis A', 'Prodi A', '5', '58,69', 'Q1'],
@@ -64,6 +59,11 @@ test('Admin QA validates input, reloads the Overview, and signs out', async ({ p
     .toHaveText(['4,33', '4', '0,47', '0,22', '4', '5']);
   await expect(page.getByRole('heading', { name: 'Distribusi RPI (jumlah dosen)' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Distribusi kuartil' })).toBeVisible();
+  await page.getByRole('button', { name: 'Distribusi', exact: true }).click();
+  for (const heading of ['Histogram Skor EDOM', 'Histogram RPI', 'Boxplot Skor EDOM', 'Boxplot RPI']) {
+    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  }
+  await expect(page.getByRole('row', { name: /^Median/ }).locator('td')).toHaveText(['4', '46,043']);
   await page.getByRole('button', { name: 'Keluar' }).click();
   await expect(page.getByRole('heading', { name: 'Masuk ke ILAD' })).toBeVisible();
 });
