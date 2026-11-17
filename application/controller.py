@@ -12,7 +12,7 @@ from analytics.ranking import calculate_ranking
 from analytics.rpi import calculate_rpi
 from analytics.statistics import StatisticsResult, calculate_descriptive_statistics
 from config.schema import OVERALL_SCORE_COLUMN, RPI_COLUMN
-from core.loader import load_csv
+from core.loader import EmptyCsvFileError, load_csv
 from core.preprocessing import preprocess_dataset
 from core.validator import ValidationResult, validate_dataset
 
@@ -106,6 +106,8 @@ class AnalyticsController:
             EmptyCsvFileError: If the uploaded CSV contains no data.
         """
         raw_data = load_csv(uploaded_file)
+        if raw_data.empty:
+            raise EmptyCsvFileError("CSV file contains no data rows")
         validation_result = validate_dataset(raw_data)
         if not validation_result.is_valid:
             raise DatasetValidationError(validation_result)

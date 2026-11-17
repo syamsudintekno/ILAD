@@ -4,3 +4,11 @@ __pycache__/
 .env
 data/*.csv
 .DS_Store
+.ilad-functions/
+.firebase/
+*-debug.log
+web/node_modules/
+web/dist/
+web/test-results/
+web/.env.local
+web/.env.*.local
