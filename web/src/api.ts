@@ -27,6 +27,7 @@ export interface Run {
   run_id: string;
   status: 'processing' | 'succeeded' | 'invalid' | 'failed';
   overview: Overview | null;
+  institutional_analytics?: InstitutionalAnalytics;
   error?: { message: string };
   validation?: {
     findings: {
@@ -36,6 +37,13 @@ export interface Run {
       invalid_score_counts?: Record<string, number>;
     };
   };
+}
+
+export const statisticColumns = ['mean', 'median', 'standard_deviation', 'variance', 'minimum', 'maximum'] as const;
+
+export interface InstitutionalAnalytics {
+  statistics: (Record<typeof statisticColumns[number], number | null> & { score: string })[];
+  rpi_histogram: { lower: number; upper: number; count: number }[];
 }
 
 export class ApiError extends Error {

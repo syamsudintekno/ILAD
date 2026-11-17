@@ -1,13 +1,13 @@
 """Regression tests for the CSV-to-Overview adapter."""
 
 import json
-from io import StringIO
+from io import BytesIO, StringIO
 
 import pandas as pd
 import pytest
 from pandas.errors import ParserError
 
-from application.controller import DatasetValidationError
+from application.controller import AnalyticsController, DatasetValidationError
 from application.web_overview import build_web_overview
 from config.schema import (
     FACULTY_COLUMN,
@@ -17,6 +17,7 @@ from config.schema import (
     STUDY_PROGRAM_COLUMN,
 )
 from core.loader import EmptyCsvFileError
+from pages.analytics import _prepare_statistics_table
 
 
 def make_csv(scores: list[float]) -> bytes:
@@ -50,6 +51,25 @@ def test_web_overview_serializes_cohort_kpis_and_top_ten() -> None:
     assert top_lecturers[0]["overall_score"] == 5.0
     assert top_lecturers[0]["rpi"] == overview["kpis"]["highest_rpi"]
     json.dumps(payload, allow_nan=False)
+
+
+def test_institutional_analytics_matches_streamlit_cohort() -> None:
+    """Match the Streamlit table and account for every RPI including tied scores."""
+    csv = make_csv([5.0, 4.0, 4.0])
+    payload = build_web_overview(csv)
+    reference = AnalyticsController().run_uploaded_csv(BytesIO(csv))
+    expected = _prepare_statistics_table(reference.statistics).rename(columns={
+        "Score": "score", "Mean": "mean", "Median": "median",
+        "Standard Deviation": "standard_deviation", "Variance": "variance",
+        "Minimum": "minimum", "Maximum": "maximum",
+    })
+    institutional = payload["institutional_analytics"]
+    pd.testing.assert_frame_equal(pd.DataFrame(institutional["statistics"]), expected)
+    histogram = institutional["rpi_histogram"]
+    assert [item["count"] for item in histogram] == [2, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    assert histogram[0]["lower"] == reference.analytics_data["rpi"].min()
+    assert histogram[-1]["upper"] == reference.analytics_data["rpi"].max()
+    assert payload["overview"]["kpis"]["quartile_distribution"] == {"Q1": 1, "Q2": 2, "Q3": 0, "Q4": 0}
 
 
 def test_web_overview_preserves_structured_validation_errors() -> None:

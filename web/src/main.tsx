@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { ApiError, quartiles, requestRun, type Overview, type Run } from './api';
 import { auth, persistence } from './firebase';
 import './styles.css';
+import { InstitutionalResults } from './InstitutionalAnalytics';
 
 const rpiFormat = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 const maxFileSize = 2 * 1024 * 1024;
@@ -96,6 +97,7 @@ function Results({ overview }: { overview: Overview }) {
 }
 
 function Dashboard({ user }: { user: User }) {
+  const [page, setPage] = useState<'overview' | 'institutional'>('overview');
   const storageKey = `ilad:last-run:${user.uid}`;
   const [runId, setRunId] = useState(() => sessionStorage.getItem(storageKey));
   const [run, setRun] = useState<Run | null>(null);
@@ -149,13 +151,17 @@ function Dashboard({ user }: { user: User }) {
 
   return <div className="dashboard">
     <div className="page-heading">
-      <div><p className="eyebrow">ANALITIK EDOM</p><h1>Overview</h1>
+      <div><p className="eyebrow">ANALITIK EDOM</p><h1>{page === 'overview' ? 'Overview' : 'Analitik Institusi'}</h1>
         <p>Skor dan peringkat RPI dihitung pada kohor dari satu unggahan.</p></div>
       <button type="button" className="secondary" disabled={busy} onClick={() => {
         if (auth) void signOut(auth).catch(() => setError(new Error('Tidak dapat keluar. Silakan coba lagi.')));
       }}>Keluar</button>
     </div>
-    <section className="card">
+    <nav className="page-switch" aria-label="Halaman analitik">
+      <button type="button" className="secondary" aria-pressed={page === 'overview'} onClick={() => setPage('overview')}>Overview</button>
+      <button type="button" className="secondary" aria-pressed={page === 'institutional'} onClick={() => setPage('institutional')}>Analitik Institusi</button>
+    </nav>
+    <section className="card" hidden={page !== 'overview'}>
       <h2>Unggah CSV EDOM</h2>
       <p>Gunakan data sintetis untuk pilot. Ukuran maksimum 2 MiB.</p>
       <form className="upload" onSubmit={upload}>
@@ -170,7 +176,12 @@ function Dashboard({ user }: { user: User }) {
       {error instanceof ApiError ? <Validation error={error} />
         : error ? <p className="notice error" role="alert">{error.message}</p> : null}
     </section>
-    {run?.overview && <Results overview={run.overview} />}
+    {page === 'overview' && run?.overview && <Results overview={run.overview} />}
+    {page === 'institutional' && (run?.overview && run.institutional_analytics
+      ? <InstitutionalResults analytics={run.institutional_analytics} kpis={run.overview.kpis} />
+      : <p className="notice">{run?.overview
+        ? 'Unggah ulang CSV di Overview untuk membuat statistik bagi run ini.'
+        : 'Unggah dan proses CSV di Overview untuk melihat analitik institusi.'}</p>)}
   </div>;
 }
 

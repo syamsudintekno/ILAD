@@ -54,6 +54,11 @@ test('Admin QA validates input, reloads the Overview, and signs out', async ({ p
   for (const [index, cells] of expected.entries()) {
     await expect(rows.nth(index).locator('th, td')).toHaveText(cells);
   }
+  await page.getByRole('button', { name: 'Analitik Institusi' }).click();
+  await expect(page.getByRole('row', { name: /Skor EDOM keseluruhan/ }).locator('td'))
+    .toHaveText(['4,33', '4', '0,47', '0,22', '4', '5']);
+  await expect(page.getByRole('heading', { name: 'Distribusi RPI (jumlah dosen)' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Distribusi kuartil' })).toBeVisible();
   await page.getByRole('button', { name: 'Keluar' }).click();
   await expect(page.getByRole('heading', { name: 'Masuk ke ILAD' })).toBeVisible();
 });

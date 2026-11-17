@@ -44,6 +44,9 @@ button.secondary { color: #16464c; background: white; border-color: #a6bab8; }
 .chart li { display: grid; grid-template-columns: 2rem 1fr 2rem; gap: .6rem; align-items: center; }
 .track { background: #dce9e7; border-radius: 1rem; height: .65rem; overflow: hidden; }
 .track > span { display: block; height: 100%; background: #217761; }
+.page-switch { display: flex; gap: .5rem; flex-wrap: wrap; }
+.page-switch button[aria-pressed="true"] { background: #176657; color: white; border-color: #176657; }
+.chart.distribution li { grid-template-columns: minmax(6rem, auto) 1fr 2.5rem; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; margin-top: .7rem; white-space: nowrap; }
 th, td { text-align: left; padding: .65rem; border-bottom: 1px solid #dce9e7; }

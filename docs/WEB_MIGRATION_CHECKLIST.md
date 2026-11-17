@@ -18,7 +18,7 @@ Centang tugas setelah kriteria pada butir tersebut terpenuhi. Catat tautan PR, h
 - [x] Verifikasi job `ILAD Firebase emulator tests` pada [runner GitHub](https://github.com/syamsudintekno/ILAD/actions/runs/44022811679).
 - [x] Tambahkan typecheck dan build frontend ke CI. Build lokal lulus.
 - [x] Verifikasi job `ILAD web build` pada [runner GitHub](https://github.com/syamsudintekno/ILAD/actions/runs/44023164356).
-- [ ] Tambahkan E2E browser ke CI.
+- [x] Tambahkan E2E browser ke CI. Dua skenario Chromium lulus bersama uji Firebase Emulator pada [PR #1](https://github.com/syamsudintekno/ILAD/actions/runs/44024947096).
 
 ## 2. Kontrak API dan akses data
 

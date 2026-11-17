@@ -38,6 +38,8 @@ Kesalahan HTTP memuat `error.code` dan `error.message`. Untuk kegagalan validasi
 
 ## Otorisasi dan penyimpanan
 
+Run baru yang berhasil juga memuat `institutional_analytics` dengan enam statistik deskriptif per dimensi dan skor EDOM keseluruhan, serta histogram RPI agregat dalam 10 interval berlebar sama. Interval terakhir mencakup skor maksimum. Run lama tetap dapat dibuka di Overview dan perlu diproses ulang untuk menampilkan Analitik Institusi.
+
 Pilot memakai akun Admin QA yang ditetapkan di server. Akun tersebut dapat mengunggah dan membaca run miliknya. Fitur ekspor dan akses Kaprodi, Dekan, LPM, serta Rektor masuk setelah pilot. Sebelum peran berbasis cakupan diaktifkan, gunakan sumber keanggotaan prodi dan fakultas yang diverifikasi institusi. Tetapkan cara menangani dosen lintas prodi tanpa mengubah kohor RPI.
 
 API menjadi jalur akses ke metadata Firestore dan objek hasil Cloud Storage. Akses langsung dari frontend ditutup. Firestore menyimpan pemilik, status, waktu, versi analitik, rujukan hasil, dan informasi minimum untuk mendeteksi unggahan berulang. Storage menyimpan hasil pilot. Baca objek melalui API setelah pemeriksaan izin. Berkas CSV diproses dalam permintaan dan tidak disimpan. Tetapkan retensi dan uji penghapusan metadata serta hasil sebelum staging menerima unggahan pengguna.
