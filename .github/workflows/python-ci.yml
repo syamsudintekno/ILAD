@@ -32,6 +32,7 @@ jobs:
     timeout-minutes: 15
     env:
       ILAD_STORAGE_BUCKET: demo-ilad.appspot.com
+      ILAD_FIREBASE_PROJECT: demo-ilad
       ILAD_ANALYTICS_VERSION: ${{ github.sha }}
       ILAD_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
     steps:
@@ -59,7 +60,7 @@ jobs:
         run: |
           export JAVA_HOME="$JAVA_HOME_21_X64"
           export PATH="$JAVA_HOME/bin:$PATH"
-          firebase emulators:exec --project demo-ilad --only auth,firestore,storage,functions '.ilad-functions/venv/bin/python firebase/emulator_smoke.py && .ilad-functions/venv/bin/python -m firebase.render_smoke && .ilad-functions/venv/bin/python firebase/browser_seed.py && npm --prefix web run test:e2e'
+          firebase emulators:exec --project demo-ilad --only auth,firestore,storage,functions '.ilad-functions/venv/bin/gunicorn --check-config render_api:app && .ilad-functions/venv/bin/python firebase/emulator_smoke.py && .ilad-functions/venv/bin/python -m firebase.render_smoke && .ilad-functions/venv/bin/python firebase/browser_seed.py && npm --prefix web run test:e2e'
 
   web-build:
     name: ILAD web build
